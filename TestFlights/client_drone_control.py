@@ -1,6 +1,7 @@
 import asyncio
 import websockets
 import pygame._sdl2.controller, pygame
+import json
 
 pygame.init()
 
@@ -37,47 +38,54 @@ joystick.init()
     left (-32768)   -->  left(-1)
     middle(0)       -->  none(0)
     right(32767)    -->  right(1)
+
+    Button 2: Pink Square    --> Hold Alitude (thrust = 0.5)  (After release of button able to release Axis 0 with out throttle going to 0)
+    Button 3: Green Triangle --> Lock/Release Target
+    Button 1: Red Circle     --> AutoLand
 '''
-
-
 
 
 async def send_message():
     uri = "ws://10.42.0.1:8765"
+    holdAlt = False
+    lockTarg = False
+    autoLand = False
     async with websockets.connect(uri) as websocket:
         while True:
-            # Send a message to the server
-            message = ''
 
-            thrust = joystick.get_axis(0)
-            while message == '':
-                for event in pygame.event.get():
-                    if event.type == pygame.CONTROLLERAXISMOTION:
-                        # Joystick axis motion event
-                        message = f"Axis {0}: {joystick.get_axis(0)}" + f", Axis {1}: {joystick.get_axis(1)}" + f", Axis {2}: {joystick.get_axis(2)}" + f", Axis {3}: {joystick.get_axis(3)}"  + f", Axis {4}: {joystick.get_axis(4)}" + f", Axis {5}: {joystick.get_axis(5)}"  
-                        break
-                    
-                    elif event.type == pygame.CONTROLLER_BUTTON_DPAD_DOWN:
-                        # Joystick button up event
-                        message = f"DPAD {event.DPAD} down"
-                        break
-                    
-                    elif event.type == pygame.CONTROLLERBUTTONDOWN:
+
+            for event in pygame.event.get():
+                    if event.type == pygame.CONTROLLERBUTTONDOWN:
                         # Joystick button down event
-                        message = f"Button {event.button} down"
+                        if event.button == 1:
+                            autoLand = True
+                            lockTarg = False
+                            holdAlt = False
+                        elif event.button == 2:
+                            holdAlt = True
                         break
 
                     elif event.type == pygame.CONTROLLERBUTTONUP:
                         # Joystick button up event
-                        message = f"Button {event.button} up"
+                        if event.button == 3:
+                            lockTarg = not lockTarg
                         break
 
+            # Send a message to the server
+            message = {
+                "thrust": 0.5 if holdAlt else 0.43 if autoLand else abs(min(joystick.get_axis(1), 0))/32768,
+                "yaw": joystick.get_axis(0),
+                "pitch": (joystick.get_axis(3)*-1),
+                "roll": joystick.get_axis(2),
+                "lockTarg": lockTarg
+            }
+
                     
-            await websocket.send(message)
+            await websocket.send(json.dumps(message))
 
             # Receive and print the response from the server
             response = await websocket.recv()
-            print(f"Server response: {response}")
+            #print(f"Server response: {response}")
             websocket.recv()
 
 # Start the WebSocket client
