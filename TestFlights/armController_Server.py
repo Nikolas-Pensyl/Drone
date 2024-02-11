@@ -8,31 +8,8 @@ import math
 import Drone
 import json
 
-message = ''
-message_read = False
 
-async def server_handler(websocket, path):
-    while True:
-        # Wait for a message from the client
-        message = await websocket.recv()
-        print(f"Client: {message}")
-
-        message_read = False
-        while not message_read: continue
-
-        # Send a response back to the client
-        response = f"Server received: {message}"
-        await websocket.send(response)
-
-
-
-def messaging():
-    # Start the WebSocket server
-    start_server = websockets.serve(server_handler, "10.42.0.1", 8765)
-    asyncio.get_event_loop().run_until_complete(start_server)
-    asyncio.get_event_loop().run_forever()
-
-def droneStartAndControl():
+async def droneStartAndControl(websocket, path):
     connection_string = '/dev/ttyS0'
     baud_rate = 57600
 
@@ -41,9 +18,9 @@ def droneStartAndControl():
     drone = Drone(connection_string, baud_rate)
     try:
         while True:
-            while message_read: continue
+            # Wait for a message from the client
+            message = await websocket.recv()
             new_message = json.loads(message)
-            message_read = True
 
             thrust = new_message['thrust']
             yaw = new_message['yaw']
@@ -52,16 +29,16 @@ def droneStartAndControl():
             lock = new_message['lockTarg']
 
             drone.set_attitude(thrust=thrust)
+
+            # Send a response back to the client
+            await websocket.send("ready")
     
     except:
         drone.set_attitude(thrust=0)
         drone.close()
 
 
-if __name__ == "__main__":
-    message_thread = Thread(target=messaging)
-    drone_thread = Thread(target=droneStartAndControl)
-
-    message_thread.start()
-    drone_thread.start()
-
+# Start the WebSocket server
+start_server = websockets.serve(droneStartAndControl, "10.42.0.1", 8765)
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()
