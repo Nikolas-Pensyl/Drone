@@ -117,36 +117,40 @@ def to_quaternion(roll = 0.0, pitch = 0.0, yaw = 0.0):
     z = t1 * t2 * t4 - t0 * t3 * t5
 
     return [w, x, y, z]
+    
+try:
+    # Take off 2.5m in GUIDED_NOGPS mode.
+    arm_and_takeoff_nogps(2.5)
+    
+    # Hold the position for 3 seconds.
+    print("Hold position for 3 seconds")
+    set_attitude(duration = 3)
+    
+    # Uncomment the lines below for testing roll angle and yaw rate.
+    # Make sure that there is enough space for testing this.
+    
+    # set_attitude(roll_angle = 1, thrust = 0.5, duration = 3)
+    # set_attitude(yaw_rate = 30, thrust = 0.5, duration = 3)
+    
+    # Move the drone forward and backward.
+    # Note that it will be in front of original position due to inertia.
+    print("Move forward")
+    set_attitude(pitch_angle = -5, thrust = 0.5, duration = 3.21)
+    
+    print("Move backward")
+    set_attitude(pitch_angle = 5, thrust = 0.5, duration = 3)
+    
+    
+    print("Setting LAND mode...")
+    vehicle.mode = VehicleMode("LAND")
+    time.sleep(1)
+    
+    # Close vehicle object before exiting script
+    print("Close vehicle object")
+    vehicle.close()
+    
+    print("Completed")
 
-# Take off 2.5m in GUIDED_NOGPS mode.
-arm_and_takeoff_nogps(2.5)
-
-# Hold the position for 3 seconds.
-print("Hold position for 3 seconds")
-set_attitude(duration = 3)
-
-# Uncomment the lines below for testing roll angle and yaw rate.
-# Make sure that there is enough space for testing this.
-
-# set_attitude(roll_angle = 1, thrust = 0.5, duration = 3)
-# set_attitude(yaw_rate = 30, thrust = 0.5, duration = 3)
-
-# Move the drone forward and backward.
-# Note that it will be in front of original position due to inertia.
-print("Move forward")
-set_attitude(pitch_angle = -5, thrust = 0.5, duration = 3.21)
-
-print("Move backward")
-set_attitude(pitch_angle = 5, thrust = 0.5, duration = 3)
-
-
-print("Setting LAND mode...")
-vehicle.mode = VehicleMode("LAND")
-time.sleep(1)
-
-# Close vehicle object before exiting script
-print("Close vehicle object")
-vehicle.close()
-
-
-print("Completed")
+except:
+    set_attitude(thrust=0)
+    vehicle.close()
