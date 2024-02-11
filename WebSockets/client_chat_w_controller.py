@@ -52,7 +52,6 @@ async def send_message():
             # Receive and print the response from the server
             response = await websocket.recv()
             print(f"Server response: {response}")
-            websocket.recv()
 
 # Start the WebSocket client
 asyncio.get_event_loop().run_until_complete(send_message())
