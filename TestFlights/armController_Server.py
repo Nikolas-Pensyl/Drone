@@ -54,6 +54,7 @@ def droneStartAndControl():
             drone.set_attitude(thrust=thrust)
     
     except:
+        drone.set_attitude(thrust=0)
         drone.close()
 
 
