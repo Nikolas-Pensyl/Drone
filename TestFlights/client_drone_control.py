@@ -69,6 +69,9 @@ async def send_message():
                         # Joystick button up event
                         if event.button == 3:
                             lockTarg = not lockTarg
+                        elif event.button ==0:
+                            autoLand = False
+                            holdAlt = False
                         break
 
             # Send a message to the server
