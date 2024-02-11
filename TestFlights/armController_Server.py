@@ -15,6 +15,7 @@ async def droneStartAndControl(websocket, path):
     # Connect to the Vehicle
     print('Connecting to vehicle on: %s' % connection_string)
     drone = connect(connection_string, baud_rate)
+    arm(drone)
     try:
         while True:
             # Wait for a message from the client
