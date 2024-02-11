@@ -1,6 +1,5 @@
 import asyncio
 import websockets
-from threading import Thread
 from dronekit import connect, VehicleMode, LocationGlobal, LocationGlobalRelative
 from pymavlink import mavutil # Needed for command message definitions
 import time
