@@ -4,7 +4,7 @@ from dronekit import connect, VehicleMode, LocationGlobal, LocationGlobalRelativ
 from pymavlink import mavutil # Needed for command message definitions
 import time
 import math
-import Drone
+from Drone import arm, set_attitude
 import json
 
 
@@ -14,7 +14,7 @@ async def droneStartAndControl(websocket, path):
 
     # Connect to the Vehicle
     print('Connecting to vehicle on: %s' % connection_string)
-    drone = Drone(connection_string, baud_rate)
+    drone = connect(connection_string, baud_rate)
     try:
         while True:
             # Wait for a message from the client
@@ -27,13 +27,13 @@ async def droneStartAndControl(websocket, path):
             roll = new_message['roll']
             lock = new_message['lockTarg']
 
-            drone.set_attitude(thrust=thrust)
+            set_attitude(vehicle=drone, thrust=thrust)
 
             # Send a response back to the client
             await websocket.send("ready")
     
     except:
-        drone.set_attitude(thrust=0)
+        set_attitude(thrust=0)
         drone.close()
 
 

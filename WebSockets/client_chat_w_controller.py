@@ -39,9 +39,6 @@ joystick.init()
     right(32767)    -->  right(1)
 '''
 
-
-
-
 async def send_message():
     uri = "ws://10.42.0.1:8765"
     async with websockets.connect(uri) as websocket:
