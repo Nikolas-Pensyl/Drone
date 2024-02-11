@@ -94,10 +94,13 @@ def set_attitude(roll_angle = 0.0, pitch_angle = 0.0,
 
 
 
+#Check which USB with ls /dev/tty*
+#ttyACM1 = USB
+#ttyACM0 = USB
+#ttyS0   = PINS
 
 
-
-connection_string = '/dev/ttyS0'
+connection_string = '/dev/ttyACM0'
 baud_rate = 57600
 
 # Connect to the Vehicle
@@ -123,7 +126,7 @@ async def droneStartAndControl(websocket, path):
             lock = new_message['lockTarg']
 
             set_attitude(thrust=thrust)
-
+            print(message)
             # Send a response back to the client
             await websocket.send("ready")
     
