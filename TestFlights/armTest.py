@@ -9,7 +9,7 @@ import argparse
 
 def connectMyCopter():
    baud_rate = 57600
-   connection_string = '/dev/ttyS0'
+   connection_string = '/dev/ttyACM0'
    vehicle = connect(connection_string, baud=baud_rate, wait_ready=True)
    return vehicle
 
@@ -32,4 +32,4 @@ def arm():
 
 vehicle = connectMyCopter()
 arm() 
-print(vehicle.gimbal)
+print(vehicle.battery)
