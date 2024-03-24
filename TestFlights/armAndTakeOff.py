@@ -13,7 +13,7 @@ baud_rate = 57600
 
 # Connect to the Vehicle
 print('Connecting to vehicle on: %s' % connection_string)
-vehicle = connect('/dev/ttyS0', baud=baud_rate, wait_ready=True)
+vehicle = connect('/dev/ttyACM0', baud=baud_rate, wait_ready=False)
 
 def arm_and_takeoff_nogps(aTargetAltitude):
 
