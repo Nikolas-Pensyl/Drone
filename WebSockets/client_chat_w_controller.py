@@ -18,7 +18,7 @@ joystick = pygame._sdl2.controller.Controller(0)
 joystick.init()
 
 async def send_message():
-    uri = "ws://10.42.0.1:8765"
+    uri = "ws://192.168.4.1:8765"
     async with websockets.connect(uri) as websocket:
         while True:
             # Send a message to the server
