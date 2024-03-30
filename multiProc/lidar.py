@@ -6,7 +6,7 @@ from math import floor
 from adafruit_rplidar import RPLidar         #import RPLidar class
 
 # Setup the RPLidar
-PORT_NAME = "/dev/tty"                   
+PORT_NAME = "/dev/ttyUSB0"                   
 lidar = RPLidar(None, PORT_NAME, timeout=3)  #initializing lidar:no logger, serial port name, serial port connection timeout in seconds
 
 def lidar_main(lidar_queue):

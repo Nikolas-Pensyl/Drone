@@ -1,3 +1,4 @@
+
 import asyncio
 import websockets
 
@@ -19,7 +20,7 @@ async def server_handler(websocket, path, server_queue, output_queue):
 
 def server_starter(server_queue, output_queue):
     # Start the WebSocket server
-    start_server = websockets.serve(server_handler, "192.168.4.1", 8765, server_queue, output_queue)
+    start_server = websockets.serve(server_handler, "10.42.0.1", 8765, server_queue, output_queue)
 
     asyncio.get_event_loop().run_until_complete(start_server)
     asyncio.get_event_loop().run_forever()
