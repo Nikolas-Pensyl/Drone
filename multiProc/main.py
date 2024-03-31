@@ -27,13 +27,12 @@ if __name__ =="__main__":
         #drone_process.join()
     
     except:
-	print("Closing")
+        print("Closing")
 
-   finally:
+    finally:
         lidar_process.kill()
         server_process.kill()
         #camera_process.kill()
         #drone_process.kill()
     
- 
     print("Done!")

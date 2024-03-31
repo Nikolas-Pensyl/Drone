@@ -32,7 +32,7 @@ def lidar_main(lidar_queue):
 
                 #Add tuple of starting and ending angle of object to array
                 elif start_obj_angle != -1 and distance > stop_distance:
-                    objs.append((start_obj_angle, ang-1))
+                    objs.append((start_obj_angle, ang))
                     start_obj_angle = -1
 
             #Check to make sure the last angle was not still in object dected mode
@@ -44,11 +44,8 @@ def lidar_main(lidar_queue):
                     objs.append((start_obj_angle, 359))
 
 
-            lidar_queue.put(str(objs))
-            print(objs)
-
-    except Exception as e:
-        print(e)
+            lidar_queue.put(objs)
+    except:
         lidar_queue.put("Error")
 
     finally:
