@@ -12,7 +12,7 @@ def arm():
     # Copter should arm in GUIDED_NOGPS mode
     drone.mode = VehicleMode("GUIDED_NOGPS")
     drone.armed = True
-
+    print(drone.battery)
     while not drone.armed:
         print(" Waiting for arming...")
         drone.armed = True

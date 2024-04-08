@@ -7,7 +7,7 @@ import cv2
 #camera_config = picam.create_preview_configuration()
 #picam.configure(camera_config)
 #print('2')
-cap=cv2.VideoCapture(cv2.CAP_V4L2)
+cap=cv2.VideoCapture()
 assert cap.isOpened(),"file/camera could not be opened"
 def nothing(x):
     pass
@@ -37,8 +37,8 @@ while True:
      #frame = cv2.imread('/home/drone/Test/test.jpg')
      #frame=picam.capture_array()
      ret, frame = cap.read()
-     #if not frame:
-         #print('Loser')
+     if not frame:
+         print('Loser')
          #while(1):
              #x = 0
          
