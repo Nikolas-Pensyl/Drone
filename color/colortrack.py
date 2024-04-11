@@ -1,14 +1,16 @@
 import time
 import numpy as np
 import cv2
-#from picamera2 import Picamera2,Preview
+from picamera2 import Picamera2,Preview
 #print('1')
 #picam=Picamera2()
 #camera_config = picam.create_preview_configuration()
 #picam.configure(camera_config)
 #print('2')
-cap=cv2.VideoCapture()
-assert cap.isOpened(),"file/camera could not be opened"
+#cap=cv2.VideoCapture()
+cv2.startWindowThread()
+
+#assert cap.isOpened(),"file/camera could not be opened"
 def nothing(x):
     pass
 #print('here')
@@ -24,21 +26,17 @@ cv2.createTrackbar("U - V", "Trackbars", 255, 255, nothing)
 
 
 
-
+picam2 = Picamera2()
+print('here')
+picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888',"size": (640,480)}))
+picam2.start()
 #picam.start()
 #print("bw")
 while True:
-     #print("here")
-     #picam.start()
-     #time.sleep(1)
-     #print('here')
-     #picam.capture_file("test.jpg")
-     #print("here")
-     #frame = cv2.imread('/home/drone/Test/test.jpg')
-     #frame=picam.capture_array()
-     ret, frame = cap.read()
-     if not frame:
-         print('Loser')
+     frame=picam2.capture_array()
+     #ret, frame = cap.read()
+     #if not frame:
+         #print('Loser')
          #while(1):
              #x = 0
          

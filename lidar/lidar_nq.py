@@ -1,4 +1,3 @@
-
 # SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
@@ -7,7 +6,7 @@ from math import floor
 from adafruit_rplidar import RPLidar         #import RPLidar class
 
 
-def lidar_main(lidar_queue):
+def lidar_main():
     # Setup the RPLidar
     PORT_NAME = "/dev/ttyUSB0"                   
     lidar = RPLidar(None, PORT_NAME, timeout=3)  #initializing lidar:no logger, serial port name, serial port connection timeout in seconds
@@ -32,27 +31,28 @@ def lidar_main(lidar_queue):
 
                 #Add tuple of starting and ending angle of object to array
                 elif start_obj_angle != -1 and distance > stop_distance:
-                    objs.append(start_obj_angle)
-                    objs.append(ang-1)
+                    objs.append((start_obj_angle, ang))
                     start_obj_angle = -1
 
             #Check to make sure the last angle was not still in object dected mode
             if start_obj_angle !=-1:
-                if len(objs)>0 and objs[0]<2:
-                     objs[0] = start_obj_angle
+                if len(objs)>0 and objs[0][0]==0:
+                     objs[0] = (start_obj_angle, objs[1])
 
                 else:
-                    objs.append(start_obj_angle)
-                    objs.append(359)
+                    objs.append((start_obj_angle, 359))
 
-            if len(objs)>0:
-                lidar_queue.put(objs)
 
+            print(objs)
     except Exception as e:
-        lidar_queue.put(e)
+        print("Error")
+        print(e)
 
     finally:
-        lidar_queue.put("Stopping.")
+        print("Stopping.")
 
         lidar.stop()
         lidar.disconnect()
+
+
+lidar_main()
