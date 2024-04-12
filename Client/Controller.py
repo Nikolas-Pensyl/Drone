@@ -3,6 +3,13 @@ import websockets
 import pygame._sdl2.controller, pygame
 import json
 
+#TODO: Move PITCH and ROLL to DPAD and Move YAW to right Joystick
+#TODO: Arm and disarm on bumpers
+
+#TODO: Battery Level (5%) and RPI Battery Level (8%) Auto Land
+#TODO: Add camera control 
+#TODO: Auto land if lost target(for more than 3 seconds) or object detected in lidar
+
 
 '''
         Axis 5: Right Trigger  --> ALTITUDE(UP/DOWN)
