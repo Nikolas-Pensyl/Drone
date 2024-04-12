@@ -47,17 +47,17 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
             
             if not lidar_queue.empty():
                 lidar_objs = lidar_queue.get()
-                output_queue.put(str(lidar_objs))
-                output_queue.put("AUTO_LANDING")
-                auto_land = True
+                #output_queue.put(str(lidar_objs))
+                #output_queue.put("AUTO_LANDING")
+                #auto_land = True
             
             
-            if auto_land:
+            '''if auto_land:
                 #0.5 is hover value 0.43 is value to slowly land
                 thrust = .43
                 yaw = 0
                 pitch = 0
-                roll = 0
+                roll = 0'''
                 #print(lidar_objs)
             
 

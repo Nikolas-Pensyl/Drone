@@ -21,7 +21,6 @@ cent_h = 96 #determines how tall "        "        "
 output = ['search','search','search']
 while True:
 #start = time.time()
-
 #for i in range (100):
     frame=picam2.capture_array()
     #ret, frame = cap.read()
@@ -64,14 +63,14 @@ while True:
             cv2.rectangle(frame,(cent_x,cent_y),(cent_x+cent_w,cent_y+cent_h),(0,0,255),2)
             cv2.putText(frame,("DETECT"),(10,60),cv2.FONT_HERSHEY_SIMPLEX,0.6,(0,0,255),2)
             
-        #else:
-            #output = ['search','search','search']
+        else:
+            output = ['search','search','search']
     print (output)        
     cv2.imshow("FRAME",frame)
 #end = time.time()
 #print(start)
 #print(end)
-    print (output)
+    #print (output)
 #print ('time: ', (end-start), 's')
     if cv2.waitKey(1)&0xFF==27:
         break
