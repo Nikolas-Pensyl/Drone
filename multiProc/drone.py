@@ -20,22 +20,54 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
     
     output_queue.put('Connecting to vehicle on: ' + connection_string)
     drone = connect(connection_string, baud_rate)
+    
+    auto_land = False
+    lock_on_target = False
+    
+    thrust = 0
+    yaw = 0
+    pitch = 0
+    roll = 0
+    lock = False
+    
     try:
         arm(drone, output_queue)
-
+        ##################################################
+        #################### main loop ###################
+        ##################################################
         while True:
-            new_message = json.loads(server_queue.get())
-            output_queue.put(lidar_queue.get())
+            if not server_queue.empty():
+                new_message = json.loads(server_queue.get())
+                
+                thrust = new_message['thrust']
+                yaw = new_message['yaw']
+                pitch = new_message['pitch']
+                roll = new_message['roll']
+                lock = new_message['lockTarg']
+            
+            if not lidar_queue.empty():
+                lidar_objs = lidar_queue.get()
+                output_queue.put(str(lidar_objs))
+                output_queue.put("AUTO_LANDING")
+                auto_land = True
+            
+            
+            if auto_land:
+                #0.5 is hover value 0.43 is value to slowly land
+                thrust = .43
+                yaw = 0
+                pitch = 0
+                roll = 0
+                #print(lidar_objs)
+            
 
-            thrust = new_message['thrust']
-            yaw = new_message['yaw']
-            pitch = new_message['pitch']
-            roll = new_message['roll']
-            lock = new_message['lockTarg']
-
-            set_attitude(thrust=thrust)
+            set_attitude(drone, thrust=thrust)
+            
+            #############################################
+            ################ END LOOP ###################
+            #############################################
     except:
-        set_attitude(thrust=0)
+        set_attitude(drone, thrust=0)
         drone.close()
     
 
@@ -46,6 +78,9 @@ def arm(drone, output_queue):
     output_queue.put("Arming Motors")
     # Copter should arm in GUIDED_NOGPS mode
     drone.mode = VehicleMode("GUIDED_NOGPS")
+    
+    output_queue.put(str(drone.battery))
+    
     drone.armed = True
 
     while not drone.armed:
