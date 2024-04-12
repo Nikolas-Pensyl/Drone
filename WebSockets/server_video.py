@@ -28,7 +28,7 @@ async def video_stream(websocket, path):
         cap.release()
 
 # Start the WebSocket server
-start_server = websockets.serve(video_stream, "10.42.0.128", 8765)
+start_server = websockets.serve(video_stream, "10.42.0.1", 8766)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
