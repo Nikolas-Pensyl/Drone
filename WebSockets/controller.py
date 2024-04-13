@@ -33,6 +33,12 @@ try:
                 # Joystick button up event
                 print(f"Button {event.button} up")
 
+            elif event.type == pygame.JOYHATMOTION:
+                try:
+                    print(joystick.get_hat(0))
+                except:
+                    pass
+
 except KeyboardInterrupt:
     pass
 

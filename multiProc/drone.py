@@ -21,21 +21,28 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
     output_queue.put('Connecting to vehicle on: ' + connection_string)
     drone = connect(connection_string, baud_rate)
     
-    auto_land = False
-    lock_on_target = False
+    
+    MAX_ANGLE = 5
+    MAX_LOST_TIME =5
     
     thrust = 0
     yaw = 0
     pitch = 0
     roll = 0
-    lock = False
-    
+    auto_land = False
+    lock_on_target = False
+    arm_drone = False
+    armed = False
+    lost_target_time = 0
+
+    ##################################################
+    #################### main loop ###################
+    ##################################################
     try:
-        arm(drone, output_queue)
-        ##################################################
-        #################### main loop ###################
-        ##################################################
         while True:
+            ##########################################################
+            ################## Get Data From Client ##################
+            ##########################################################
             if not server_queue.empty():
                 new_message = json.loads(server_queue.get())
                 
@@ -43,26 +50,101 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                 yaw = new_message['yaw']
                 pitch = new_message['pitch']
                 roll = new_message['roll']
-                lock = new_message['lockTarg']
-            
-            if not lidar_queue.empty():
+                lock_on_target = new_message['lockTarg']
+                arm_drone = new_message['armed']
+
+
+            ###########################################################
+            ################# Arm Drone State #########################
+            ###########################################################
+            if not armed:
                 lidar_objs = lidar_queue.get()
-                #output_queue.put(str(lidar_objs))
-                #output_queue.put("AUTO_LANDING")
-                #auto_land = True
-            
-            
-            '''if auto_land:
-                #0.5 is hover value 0.43 is value to slowly land
-                thrust = .43
-                yaw = 0
-                pitch = 0
-                roll = 0'''
-                #print(lidar_objs)
+                if arm_drone:
+                    arm(drone, output_queue)
             
 
-            set_attitude(drone, thrust=thrust)
-            
+
+            if armed and arm_drone:
+                ######################################################
+                ############  Lidar Detection ########################
+                ######################################################
+                if not lidar_queue.empty():
+                    lidar_objs = lidar_queue.get()
+                    #output_queue.put(str(lidar_objs))
+                    #output_queue.put("AUTO_LANDING")
+                    #auto_land = True
+                    #lock_on_target = False
+                
+
+
+                ##############################################################
+                ###########  Camera Handling #################################
+                ##############################################################
+                if not camera_queue.empty():
+                    camera_instructs = camera_queue.get()
+                    #output_queue.put(str(camera_instructs))
+
+                    if camera_instructs[0] != "search" and lock_on_target:
+                        if camera_instructs[0] == "LEFT":
+                            roll = -1*MAX_ANGLE
+                        elif camera_instructs[0] == "RIGHT":
+                            roll = MAX_ANGLE
+                        else: 
+                            roll = 0
+                        
+                        if camera_instructs[1] == "UP":
+                            thrust = .58
+                        elif camera_instructs[1] == "DOWN":
+                            thrust = .45
+                        else:
+                            thrust = 0.5
+                        
+                        if camera_instructs[2] == "FORWARD":
+                            pitch = MAX_ANGLE
+                        elif camera_instructs[2] == "BACK":
+                            pitch = -1*MAX_ANGLE
+                        else:
+                            pitch = 0
+
+                        lost_target_time = 0
+                    elif lock_on_target:
+                        #If target is lost wait MAX_LOST_TIME for target to reappear otherwise auto land
+                        if lost_target_time == 0:
+                            lost_target_time = time.time()
+                        
+                        if lost_target_time + MAX_LOST_TIME> time.time():
+                            auto_land = True
+                            lock_on_target = False
+                        
+                        pitch = 0
+                        thrust = 0.5
+                        roll = 0
+                        yaw = 0
+                        
+
+                ##############################################################
+                ################# Battery Check ##############################
+                ##############################################################
+                #if drone.battery
+
+                ################################################################   
+                ##################  AUTO LAND ##################################
+                ###############################################################      
+                if auto_land:
+                    #0.5 is hover value 0.43 is value to slowly land
+                    thrust = .43
+                    yaw = 0
+                    pitch = 0
+                    roll = 0
+                    #print(lidar_objs)
+                
+                #Send intructions to drone
+                set_attitude(drone, thrust=thrust, roll_angle=roll, pitch_angle=pitch, yaw_angle=yaw)
+
+            elif armed and not arm_drone:
+                disarm(drone, output_queue)
+
+
             #############################################
             ################ END LOOP ###################
             #############################################
@@ -89,6 +171,22 @@ def arm(drone, output_queue):
         drone.armed = True
         time.sleep(1)
     
+    output_queue.put("Armed")
+    return None
+
+def disarm(drone, output_queue):
+    #print("Arming motors")
+    output_queue.put("Disarming Motors")
+    
+    drone.armed = False
+
+    while drone.armed:
+        #print(" Waiting for arming...")
+        output_queue.put(" Waiting for disarming...")
+        drone.armed = False
+        time.sleep(1)
+
+    output_queue.put("Disarmed")
     return None
 
 def send_attitude_target(drone, roll_angle = 0.0, pitch_angle = 0.0,
@@ -151,6 +249,8 @@ def set_attitude(drone, roll_angle = 0.0, pitch_angle = 0.0,
     send_attitude_target(drone, roll_angle, pitch_angle,
                         yaw_angle, yaw_rate, False,
                         thrust)
+    
+    '''
     start = time.time()
     while time.time() - start < duration:
         send_attitude_target(drone, roll_angle, pitch_angle,
@@ -161,3 +261,4 @@ def set_attitude(drone, roll_angle = 0.0, pitch_angle = 0.0,
     send_attitude_target(drone, 0, 0,
                         0, 0, True,
                         thrust)
+    '''
