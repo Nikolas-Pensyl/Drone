@@ -60,7 +60,7 @@ async def send_message(controller_queue):
     holdAlt = False
     lockTarg = False
     autoLand = False
-    arm_drone = False
+    arm_drone = True
     thrust_active = False
 
     MAX_ANGLE = 3

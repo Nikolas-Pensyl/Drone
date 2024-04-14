@@ -31,14 +31,15 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
     roll = 0
     auto_land = False
     lock_on_target = False
-    arm_drone = False
-    armed = False
+    arm_drone = True
+    armed = True
     lost_target_time = 0
 
     ##################################################
     #################### main loop ###################
     ##################################################
     try:
+        arm(drone, output_queue)
         while True:
             ##########################################################
             ################## Get Data From Client ##################
@@ -51,20 +52,19 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                 pitch = new_message['pitch']
                 roll = new_message['roll']
                 lock_on_target = bool(new_message['lockTarg'])
-                arm_drone = bool(new_message['arm_drone'])
+                #arm_drone = bool(new_message['arm_drone'])
 
 
             ###########################################################
             ################# Arm Drone State #########################
             ###########################################################
-            if not armed:
-                lidar_objs = lidar_queue.get()
-                if arm_drone:
-                    arm(drone, output_queue)
+            #if#not armed:
+                #if arm_drone:
+                    ##arm(drone, output_queue)
             
 
 
-            if armed and arm_drone:
+            if True: #armed and arm_drone:
                 ######################################################
                 ############  Lidar Detection ########################
                 ######################################################
