@@ -40,8 +40,15 @@ import json
         Button 1: Red Circle     --> AutoLand
         Button 2: Pink Square    --> Hold Alitude (thrust = 0.5)  (After release of button able to release Axis 0 with out throttle going to 0)
         Button 3: Green Triangle --> Lock/Release Target
-        Button 4: Left Bumper    --> DisArm (Only when throttle is 0 and Drone is armed)
-        Button 5: Right Bumper   --> Arm    (Only when drone is in DisArm State)
+        Button 9: Left Bumper    --> DisArm (Only when throttle is 0 and Drone is armed)
+        Button 10: Right Bumper   --> Arm    (Only when drone is in DisArm State)
+
+
+        DPAD:
+        Button 11: DPAD UP   -->  forwards(3)
+        Button 12: DPAD Down -->  backwards(3)
+        Button 13: DPAD Left -->  left(3)
+        Button 14: DPAD Right --> right(3)
     '''
 
 def controller_main():
@@ -56,7 +63,7 @@ async def send_message():
     armed = False
     thrust_active = False
 
-    MAX_ANGLE = 5
+    MAX_ANGLE = 3
     MIN_THROTTLE =  .4
     MAX_THROTTLE = .75
 
@@ -93,9 +100,11 @@ async def send_message():
 
                         elif event.button == 4 and joy_axis_5 == 0 and armed and not holdAlt and not lockTarg and not thrust_active:
                             armed = False
+                            print("Disarming")
 
-                        elif event.button == 5 and joy_axis_5 == 0 and not armed:
+                        elif event.button == 10 and joy_axis_5 == 0 and not armed:
                             armed = True
+                            print("Arming")
                         break
 
                     elif event.type == pygame.CONTROLLERBUTTONUP:
@@ -116,8 +125,8 @@ async def send_message():
             message = {
                 "thrust": 0 if not thrust_active else 0.43 if autoLand else 0.5 if autoLand else ((joy_axis_5/32767)*MULTIPLY_THROTTLE)+MIN_THROTTLE,
                 "yaw": joystick.get_axis(2),
-                "pitch": joystick.get_hat(0)[1]*MAX_ANGLE,
-                "roll": joystick.get_hat(0)[0]*MAX_ANGLE,
+                "pitch": MAX_ANGLE if joystick.get_button(11) else -1*MAX_ANGLE if joystick.get_button(12) else 0,
+                "roll": MAX_ANGLE*-1 if joystick.get_button(13) else MAX_ANGLE if joystick.get_button(14) else 0,
                 "lockTarg": lockTarg,
                 "armed": armed
             }

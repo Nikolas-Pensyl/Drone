@@ -9,8 +9,6 @@ async def server_handler(server_queue, output_queue, websocket, path):
         message = await websocket.recv()
         if not server_queue.full():
             server_queue.put(message)
-        if message != '':
-            print(message)
 
         # Send a response back to the client
         if not output_queue.empty():

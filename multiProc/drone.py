@@ -161,7 +161,7 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
 
 
 def arm(drone, output_queue):
-    #print("Arming motors")
+    print("Arming motors")
     output_queue.put("Arming Motors")
     # Copter should arm in GUIDED_NOGPS mode
     drone.mode = VehicleMode("GUIDED_NOGPS")
@@ -171,7 +171,7 @@ def arm(drone, output_queue):
     drone.armed = True
 
     while not drone.armed:
-        #print(" Waiting for arming...")
+        print(" Waiting for arming...")
         output_queue.put(" Waiting for arming...")
         drone.armed = True
         time.sleep(1)
@@ -180,7 +180,7 @@ def arm(drone, output_queue):
     return None
 
 def disarm(drone, output_queue):
-    #print("Arming motors")
+    print("Disarming motors")
     output_queue.put("Disarming Motors")
     
     drone.armed = False

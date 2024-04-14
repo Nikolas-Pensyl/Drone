@@ -1,21 +1,19 @@
-import pygame
+import pygame._sdl2.controller, pygame
 
 pygame.init()
 
 # Initialize the joystick
-pygame.joystick.init()
+pygame._sdl2.controller.init()
 
 # Check if any joystick is connected
-if pygame.joystick.get_count() == 0:
+if pygame._sdl2.controller.get_count() == 0:
     print("No joystick connected.")
     pygame.quit()
     exit()
 
 # Initialize the first joystick
-joystick = pygame.joystick.Joystick(0)
+joystick = pygame._sdl2.controller.Controller(0)
 joystick.init()
-
-print(f"Joystick Name: {joystick.get_name()}")
 
 try:
     while True:
@@ -38,6 +36,7 @@ try:
                     print(joystick.get_hat(0))
                 except:
                     pass
+        
 
 except KeyboardInterrupt:
     pass
