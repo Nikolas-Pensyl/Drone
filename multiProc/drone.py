@@ -50,8 +50,8 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                 yaw = new_message['yaw']
                 pitch = new_message['pitch']
                 roll = new_message['roll']
-                lock_on_target = new_message['lockTarg']
-                arm_drone = new_message['armed']
+                lock_on_target = bool(new_message['lockTarg'])
+                arm_drone = bool(new_message['arm_drone'])
 
 
             ###########################################################

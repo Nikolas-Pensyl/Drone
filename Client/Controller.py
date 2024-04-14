@@ -40,7 +40,7 @@ import json
         Button 1: Red Circle     --> AutoLand
         Button 2: Pink Square    --> Hold Alitude (thrust = 0.5)  (After release of button able to release Axis 0 with out throttle going to 0)
         Button 3: Green Triangle --> Lock/Release Target
-        Button 9: Left Bumper    --> DisArm (Only when throttle is 0 and Drone is armed)
+        Button 9: Left Bumper    --> DisArm (Only when throttle is 0 and Drone is arm_drone)
         Button 10: Right Bumper   --> Arm    (Only when drone is in DisArm State)
 
 
@@ -51,16 +51,16 @@ import json
         Button 14: DPAD Right --> right(3)
     '''
 
-def controller_main():
+def controller_main(controller_queue):
     # Start the WebSocket client
-    asyncio.get_event_loop().run_until_complete(send_message())
+    asyncio.get_event_loop().run_until_complete(send_message(controller_queue))
 
-async def send_message():
+async def send_message(controller_queue):
     uri = "ws://10.42.0.1:8765"
     holdAlt = False
     lockTarg = False
     autoLand = False
-    armed = False
+    arm_drone = False
     thrust_active = False
 
     MAX_ANGLE = 3
@@ -76,7 +76,7 @@ async def send_message():
 
     # Check if any joystick is connected
     if pygame._sdl2.controller.get_count() == 0:
-        print("No joystick connected.")
+        controller_queue.put("No joystick connected.")
         pygame.quit()
         exit()
 
@@ -85,38 +85,37 @@ async def send_message():
     joystick.init()
 
     async with websockets.connect(uri) as websocket:
+        print("Test")
         while True:
             joy_axis_5 = joystick.get_axis(5)
             for event in pygame.event.get():
                     if event.type == pygame.CONTROLLERBUTTONDOWN:
                         # Joystick button down event
-                        if event.button == 1 and armed and thrust_active:
+                        if event.button == 1 and arm_drone and thrust_active:
                             autoLand = True
                             lockTarg = False
                             holdAlt = False
 
-                        elif event.button == 2 and armed and thrust_active:
+                        elif event.button == 2 and arm_drone and thrust_active:
                             holdAlt = True
 
-                        elif event.button == 4 and joy_axis_5 == 0 and armed and not holdAlt and not lockTarg and not thrust_active:
-                            armed = False
-                            print("Disarming")
+                        elif event.button == 9 and arm_drone and not holdAlt and not lockTarg and not thrust_active:
+                            arm_drone = False
+                            controller_queue.put("Disarming")
 
-                        elif event.button == 10 and joy_axis_5 == 0 and not armed:
-                            armed = True
-                            print("Arming")
-                        break
+                        elif event.button == 10 and not arm_drone:
+                            arm_drone = True
+                            controller_queue.put("Arming")
 
                     elif event.type == pygame.CONTROLLERBUTTONUP:
                         # Joystick button up event
-                        if event.button == 3 and armed and thrust_active: 
+                        if event.button == 3 and arm_drone and thrust_active: 
                             lockTarg = not lockTarg
-                        elif event.button ==0 and armed:
+                        elif event.button ==0 and arm_drone:
                             autoLand = False
                             holdAlt = False
                             lockTarg = False
                             thrust_active = not thrust_active
-                        break
             
 
             
@@ -128,7 +127,7 @@ async def send_message():
                 "pitch": MAX_ANGLE if joystick.get_button(11) else -1*MAX_ANGLE if joystick.get_button(12) else 0,
                 "roll": MAX_ANGLE*-1 if joystick.get_button(13) else MAX_ANGLE if joystick.get_button(14) else 0,
                 "lockTarg": lockTarg,
-                "armed": armed
+                "arm_drone": arm_drone
             }
 
                     
@@ -137,4 +136,4 @@ async def send_message():
             # Receive and print the response from the server
             response = await websocket.recv()
             if len(response)>0:
-                print(response)
+                controller_queue.put(response)
