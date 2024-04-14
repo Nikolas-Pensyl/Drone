@@ -70,10 +70,13 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                 ######################################################
                 if not lidar_queue.empty():
                     lidar_objs = lidar_queue.get()
-                    #output_queue.put(str(lidar_objs))
-                    #output_queue.put("AUTO_LANDING")
-                    #auto_land = True
-                    #lock_on_target = False
+                    if not auto_land and thrust>0:
+                        output_queue.put(str(lidar_objs))
+                        output_queue.put("AUTO_LANDING")
+                        auto_land = True
+                        lock_on_target = False
+                    elif not auto_land:
+                        output_queue.put(str(drone.battery))
                 
 
 
@@ -107,6 +110,8 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                             pitch = 0
 
                         lost_target_time = 0
+                        yaw = 0
+
                     elif lock_on_target:
                         #If target is lost wait MAX_LOST_TIME for target to reappear otherwise auto land
                         if lost_target_time == 0:
