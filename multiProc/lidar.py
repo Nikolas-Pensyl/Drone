@@ -14,7 +14,7 @@ def lidar_main(lidar_queue):
 
     # variable used for stop distance from lidar, 3000 = ~9.5 ft.
     # we need at minimun 5.5 to 6ft of distance to avoid crash at 15mph min val = 2300
-    stop_distance = 3000
+    stop_distance = 2000
 
     try:
         for scan in lidar.iter_scans():  #returns list of 3 measurements (tuples) in 1 rotation: quality, angle, and distance
@@ -23,6 +23,7 @@ def lidar_main(lidar_queue):
 
             for _, angle, distance in scan:      #only want angle and distance
                 ang = min(359, floor(angle))
+                if ang>45 and ang<135: continue
                 #print(scan_data[min([359, floor(angle)])])
                 #print (min([359, floor(angle)]))
 

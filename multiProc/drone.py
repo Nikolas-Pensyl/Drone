@@ -33,6 +33,7 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
     lock_on_target = False
     arm_drone = True
     armed = True
+    target_locked = False
     lost_target_time = 0
 
     ##################################################
@@ -70,8 +71,8 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                 ######################################################
                 if not lidar_queue.empty():
                     lidar_objs = lidar_queue.get()
-                    if not auto_land and thrust>0:
-                        output_queue.put(str(lidar_objs))
+                    output_queue.put(str(lidar_objs))
+                    if not auto_land and thrust>0 and lock_on_target:
                         output_queue.put("AUTO_LANDING")
                         auto_land = True
                         lock_on_target = False
@@ -88,6 +89,11 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                     #output_queue.put(str(camera_instructs))
 
                     if camera_instructs[0] != "search" and lock_on_target:
+                        if not target_locked: 
+                            output_queue.put("Target Locked")
+
+                        output_queue.put(str(camera_instructs))
+
                         if camera_instructs[0] == "LEFT":
                             roll = -1*MAX_ANGLE
                         elif camera_instructs[0] == "RIGHT":
@@ -103,14 +109,15 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                             thrust = 0.5
                         
                         if camera_instructs[2] == "FORWARD":
-                            pitch = MAX_ANGLE
-                        elif camera_instructs[2] == "BACK":
                             pitch = -1*MAX_ANGLE
+                        elif camera_instructs[2] == "BACK":
+                            pitch = MAX_ANGLE
                         else:
                             pitch = 0
 
                         lost_target_time = 0
                         yaw = 0
+                        target_locked = True
 
                     elif lock_on_target:
                         #If target is lost wait MAX_LOST_TIME for target to reappear otherwise auto land
