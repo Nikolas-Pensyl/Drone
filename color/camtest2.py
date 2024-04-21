@@ -7,14 +7,14 @@ import functools
 import asyncio
 
 
-async def video_stream(websocket, path):
+def camera_main():
     cv2.startWindowThread()
-                         #30, 99, 133
-    lower_range=np.array([29,99,130]) #Neon Yellow 
-    upper_range=np.array([90,255,255]) 
+
+    lower_range=np.array([30,99,133]) #Neon Yellow 
+    upper_range=np.array([80,255,255]) 
     
-    print("Starting")
     picam2 = Picamera2()
+    print("Starting")
     picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888',"size": (640,480)}))
     picam2.start()
 
@@ -72,18 +72,6 @@ async def video_stream(websocket, path):
     
             print(output)
 
-
-            #Send Camera Frame to Client
-            # Encode the frame to JPEG format
-            #_, encoded_frame = cv2.imencode('.jpg', frame)
-
-            # Convert the encoded frame to base64 for transmission
-            #base64_frame = base64.b64encode(encoded_frame.tobytes()).decode('utf-8')
-
-            # Send the base64 encoded frame to the client
-            #await websocket.send(base64_frame)
-
-
             if cv2.waitKey(1)&0xFF==27:
                 break
     
@@ -94,10 +82,4 @@ async def video_stream(websocket, path):
         print("Stopping Camera")
         cv2.destroyAllWindows()
 
-
-# Start the WebSocket server
-start_server = websockets.serve(video_stream, "10.42.0.1", 8766)
-
-asyncio.get_event_loop().run_until_complete(start_server)
-asyncio.get_event_loop().run_forever()
-
+camera_main()

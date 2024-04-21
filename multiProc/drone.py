@@ -86,13 +86,11 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                 ##############################################################
                 if not camera_queue.empty():
                     camera_instructs = camera_queue.get()
-                    #output_queue.put(str(camera_instructs))
+                    output_queue.put(str(camera_instructs))
 
                     if camera_instructs[0] != "search" and lock_on_target:
                         if not target_locked: 
                             output_queue.put("Target Locked")
-
-                        output_queue.put(str(camera_instructs))
 
                         if camera_instructs[0] == "LEFT":
                             roll = -1*MAX_ANGLE
