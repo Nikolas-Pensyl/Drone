@@ -66,6 +66,8 @@ async def send_message(controller_queue):
     MAX_ANGLE = 5
     MIN_THROTTLE =  .4
     MAX_THROTTLE = 1
+    HOVER_THROTTLE = .5
+    AUTO_LAND_THROTTLE = .4
 
     MULTIPLY_THROTTLE  = MAX_THROTTLE-MIN_THROTTLE
 
@@ -123,7 +125,7 @@ async def send_message(controller_queue):
 
             # Send a message to the server
             message = {
-                "thrust": 0 if not thrust_active else 0.43 if autoLand else 0.5 if holdAlt or lockTarg else ((joy_axis_5/32767)*MULTIPLY_THROTTLE)+MIN_THROTTLE,
+                "thrust": 0 if not thrust_active else AUTO_LAND_THROTTLE if autoLand else HOVER_THROTTLE if holdAlt or lockTarg else ((joy_axis_5/32767)*MULTIPLY_THROTTLE)+MIN_THROTTLE,
                 "yaw": joystick.get_axis(2),
                 "pitch": MAX_ANGLE*-1 if joystick.get_button(11) else MAX_ANGLE if joystick.get_button(12) else 0,
                 "roll": MAX_ANGLE*-1 if joystick.get_button(13) else MAX_ANGLE if joystick.get_button(14) else 0,
