@@ -7,9 +7,15 @@ import functools
 import asyncio
 
 def start_camera(camera_queue):
-    camera_main(camera_queue)
+    # Start the WebSocket server
+    start_server = websockets.serve(functools.partial(camera_main, camera_queue), "10.42.0.1", 8766)
 
-def camera_main(camera_queue):
+    asyncio.get_event_loop().run_until_complete(start_server)
+    asyncio.get_event_loop().run_forever()
+
+
+
+async def camera_main(camera_queue, websocket, path):
     cv2.startWindowThread()
                          #30, 99, 133
     lower_range=np.array([29,99,130]) #Neon Yellow 
@@ -72,7 +78,19 @@ def camera_main(camera_queue):
                 else:
                     output = ['search','search','search']
     
-            camera_queue.put(str(output))
+            camera_queue.put(output)
+
+
+            #Send Camera Frame to Client
+            # Encode the frame to JPEG format
+            _, encoded_frame = cv2.imencode('.jpg', frame)
+
+            # Convert the encoded frame to base64 for transmission
+            base64_frame = base64.b64encode(encoded_frame.tobytes()).decode('utf-8')
+
+            # Send the base64 encoded frame to the client
+            await websocket.send(base64_frame)
+
 
             if cv2.waitKey(1)&0xFF==27:
                 break
