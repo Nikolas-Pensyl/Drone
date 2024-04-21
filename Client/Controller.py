@@ -61,11 +61,11 @@ async def send_message(controller_queue):
     lockTarg = False
     autoLand = False
     arm_drone = True
-    thrust_active = False
+    thrust_active = True
 
-    MAX_ANGLE = 3
+    MAX_ANGLE = 5
     MIN_THROTTLE =  .4
-    MAX_THROTTLE = .75
+    MAX_THROTTLE = 1
 
     MULTIPLY_THROTTLE  = MAX_THROTTLE-MIN_THROTTLE
 
@@ -111,6 +111,7 @@ async def send_message(controller_queue):
                         # Joystick button up event
                         if event.button == 3 and arm_drone and thrust_active: 
                             lockTarg = not lockTarg
+                            controller_queue.put("Locking Target: ", lockTarg)
                         elif event.button ==0 and arm_drone:
                             autoLand = False
                             holdAlt = False
@@ -122,9 +123,9 @@ async def send_message(controller_queue):
 
             # Send a message to the server
             message = {
-                "thrust": 0 if not thrust_active else 0.43 if autoLand else 0.5 if autoLand else ((joy_axis_5/32767)*MULTIPLY_THROTTLE)+MIN_THROTTLE,
+                "thrust": 0 if not thrust_active else 0.43 if autoLand else 0.5 if holdAlt or lockTarg else ((joy_axis_5/32767)*MULTIPLY_THROTTLE)+MIN_THROTTLE,
                 "yaw": joystick.get_axis(2),
-                "pitch": MAX_ANGLE if joystick.get_button(11) else -1*MAX_ANGLE if joystick.get_button(12) else 0,
+                "pitch": MAX_ANGLE*-1 if joystick.get_button(11) else MAX_ANGLE if joystick.get_button(12) else 0,
                 "roll": MAX_ANGLE*-1 if joystick.get_button(13) else MAX_ANGLE if joystick.get_button(14) else 0,
                 "lockTarg": lockTarg,
                 "arm_drone": arm_drone

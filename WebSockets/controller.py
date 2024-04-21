@@ -21,7 +21,7 @@ try:
         for event in pygame.event.get():
             if event.type == pygame.JOYAXISMOTION:
                 # Joystick axis motion event
-                print(f"Axis {event.axis} and {joystick.get_id()}: {joystick.get_axis(event.axis)}")
+                print(f"Axis {event.axis}: {joystick.get_axis(event.axis)}")
 
             elif event.type == pygame.JOYBUTTONDOWN:
                 # Joystick button down event
