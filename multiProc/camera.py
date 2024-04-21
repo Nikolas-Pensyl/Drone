@@ -17,9 +17,9 @@ def start_camera(camera_queue):
 
 async def camera_main(camera_queue, websocket, path):
     cv2.startWindowThread()
-
-    lower_range=np.array([30,99,133]) #Neon Yellow 
-    upper_range=np.array([80,255,255]) 
+                         #30, 99, 133
+    lower_range=np.array([29,99,130]) #Neon Yellow 
+    upper_range=np.array([90,255,255]) 
     
     picam2 = Picamera2()
     camera_queue.put("Starting")
@@ -41,7 +41,7 @@ async def camera_main(camera_queue, websocket, path):
             frame=picam2.capture_array()
 
             frame=cv2.resize(frame,(640,480))
-            hsv=cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+            '''hsv=cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
             mask=cv2.inRange(hsv,lower_range,upper_range)
             _,mask1=cv2.threshold(mask,254,255,cv2.THRESH_BINARY)
             cnts,_=cv2.findContours(mask1,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
@@ -78,7 +78,7 @@ async def camera_main(camera_queue, websocket, path):
                 else:
                     output = ['search','search','search']
     
-            camera_queue.put(output)
+            camera_queue.put(output)'''
 
 
             #Send Camera Frame to Client
