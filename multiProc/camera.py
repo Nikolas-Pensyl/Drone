@@ -12,8 +12,9 @@ def start_camera(camera_queue):
 def camera_main(camera_queue):
     cv2.startWindowThread()
                          #30, 99, 133
-    lower_range=np.array([29,99,130]) #Neon Yellow 
-    upper_range=np.array([90,255,255]) 
+                         #90, 255, 255
+    lower_range=np.array([11,204,152]) #Neon Yellow 
+    upper_range=np.array([47,255,255]) 
     
     picam2 = Picamera2()
     camera_queue.put("Starting")
@@ -73,7 +74,7 @@ def camera_main(camera_queue):
                     output = ['search','search','search']
     
             camera_queue.put(str(output))
-
+            cv2.imshow("FRAME", frame)
             if cv2.waitKey(1)&0xFF==27:
                 break
     

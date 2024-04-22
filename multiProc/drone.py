@@ -22,7 +22,7 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
     drone = connect(connection_string, baud_rate)
     
     
-    MAX_ANGLE = 5
+    MAX_ANGLE = 8
     MAX_LOST_TIME =5
     
     thrust = 0
@@ -76,8 +76,6 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                         output_queue.put("AUTO_LANDING")
                         #auto_land = True
                         #lock_on_target = False
-                    elif not auto_land:
-                        output_queue.put(str(drone.battery))
                 
 
 
@@ -86,7 +84,8 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                 ##############################################################
                 if not camera_queue.empty():
                     camera_instructs = camera_queue.get()
-                    output_queue.put(str(camera_instructs))
+                    if lock_on_target:
+                        output_queue.put(str(camera_instructs))
 
                     if camera_instructs[0] != "search" and lock_on_target:
                         if not target_locked: 
@@ -135,21 +134,25 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                 ##############################################################
                 ################# Battery Check ##############################
                 ##############################################################
-                #if drone.battery
+                batt = drone.battery
+                output_queue.put(str(batt))
+                if batt.voltage <= 10.8:
+                    auto_land = True
+                    lock_on_target = False
 
                 ################################################################   
                 ##################  AUTO LAND ##################################
                 ###############################################################      
                 if auto_land:
                     #0.5 is hover value 0.43 is value to slowly land
-                    thrust = .43
+                    thrust = .4
                     yaw = 0
                     pitch = 0
                     roll = 0
                     #print(lidar_objs)
                 
                 #Send intructions to drone
-                set_attitude(drone, thrust=thrust, roll_angle=roll, pitch_angle=pitch, yaw_angle=yaw)
+                set_attitude(drone, thrust=thrust, roll_angle=roll, pitch_angle=pitch, yaw_rate=yaw)
 
             elif armed and not arm_drone:
                 disarm(drone, output_queue)
@@ -209,12 +212,13 @@ def send_attitude_target(drone, roll_angle = 0.0, pitch_angle = 0.0,
             Note that as of Copter 3.5, thrust = 0.5 triggers a special case in
             the code for maintaining current altitude.
     """
-    if yaw_angle is None:
-        # this value may be unused by the vehicle, depending on use_yaw_rate
-        yaw_angle = drone.attitude.yaw
+    # this value may be unused by the vehicle, depending on use_yaw_rate
+    yaw_angle = drone.attitude.yaw
     # Thrust >  0.5: Ascend
     # Thrust == 0.5: Hold the altitude
     # Thrust <  0.5: Descend
+    yaw_angle = (yaw_angle+yaw_rate*2)%360
+
     msg = drone.message_factory.set_attitude_target_encode(
         0, # time_boot_ms
         1, # Target system
@@ -223,7 +227,7 @@ def send_attitude_target(drone, roll_angle = 0.0, pitch_angle = 0.0,
         to_quaternion(roll_angle, pitch_angle, yaw_angle), # Quaternion
         0, # Body roll rate in radian
         0, # Body pitch rate in radian
-        math.radians(yaw_rate), # Body yaw rate in radian/second
+        0, # Body yaw rate in radian/second
         thrust  # Thrust
     )
     drone.send_mavlink(msg)
