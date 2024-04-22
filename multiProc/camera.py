@@ -74,7 +74,7 @@ def camera_main(camera_queue):
                     output = ['search','search','search']
     
             camera_queue.put(str(output))
-            #cv2.imshow("FRAME", frame)
+            cv2.imshow("FRAME", frame)
             if cv2.waitKey(1)&0xFF==27:
                 break
     
