@@ -19,7 +19,7 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
     #print('Connecting to vehicle on: %s' % connection_string)
     
     output_queue.put('Connecting to vehicle on: ' + connection_string)
-    drone = connect(connection_string, baud_rate)
+    drone = connect(connection_string)
     
     
     MAX_ANGLE = 8
@@ -136,9 +136,10 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                 ##############################################################
                 batt = drone.battery
                 output_queue.put(str(batt))
-                if batt.voltage <= 10.8:
+                '''if batt.voltage <= 10.8:
+                    output_queue.put("LOW BATTERY: AUTO LANDING ENGAGED")
                     auto_land = True
-                    lock_on_target = False
+                    lock_on_target = False'''
 
                 ################################################################   
                 ##################  AUTO LAND ##################################
@@ -152,7 +153,7 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                     #print(lidar_objs)
                 
                 #Send intructions to drone
-                set_attitude(drone, thrust=thrust, roll_angle=roll, pitch_angle=pitch, yaw_rate=yaw)
+                set_attitude(drone, thrust=thrust, roll_angle=roll, pitch_angle=pitch, yaw_angle=yaw)
 
             elif armed and not arm_drone:
                 disarm(drone, output_queue)
@@ -217,17 +218,16 @@ def send_attitude_target(drone, roll_angle = 0.0, pitch_angle = 0.0,
     # Thrust >  0.5: Ascend
     # Thrust == 0.5: Hold the altitude
     # Thrust <  0.5: Descend
-    yaw_angle = (yaw_angle+yaw_rate*2)%360
 
     msg = drone.message_factory.set_attitude_target_encode(
         0, # time_boot_ms
         1, # Target system
         1, # Target component
         0b00000000 if use_yaw_rate else 0b00000100,
-        to_quaternion(roll_angle, pitch_angle, yaw_angle), # Quaternion
+        to_quaternion(roll_angle, pitch_angle, 0), # Quaternion
         0, # Body roll rate in radian
         0, # Body pitch rate in radian
-        0, # Body yaw rate in radian/second
+        math.radians(yaw_rate), # Body yaw rate in radian/second
         thrust  # Thrust
     )
     drone.send_mavlink(msg)

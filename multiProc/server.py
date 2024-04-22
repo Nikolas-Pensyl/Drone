@@ -18,7 +18,7 @@ async def server_handler(server_queue, output_queue, websocket, path):
 
 def server_starter(server_queue, output_queue):
     # Start the WebSocket server
-    start_server = websockets.serve(functools.partial(server_handler, server_queue, output_queue), "10.42.0.1", 8765)
+    start_server = websockets.serve(functools.partial(server_handler, server_queue, output_queue), "10.42.1.1", 8765)
 
     asyncio.get_event_loop().run_until_complete(start_server)
     asyncio.get_event_loop().run_forever()
