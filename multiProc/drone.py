@@ -52,17 +52,6 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                 pitch = new_message['pitch']
                 roll = new_message['roll']
                 lock_on_target = bool(new_message['lockTarg'])
-                #arm_drone = bool(new_message['arm_drone'])
-
-
-            ###########################################################
-            ################# Arm Drone State #########################
-            ###########################################################
-            #if#not armed:
-                #if arm_drone:
-                    ##arm(drone, output_queue)
-            
-
 
             if True: #armed and arm_drone:
                 ######################################################
@@ -135,10 +124,10 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                 ##############################################################
                 batt = drone.battery
                 output_queue.put(str(batt))
-                '''if batt.voltage <= 10.8:
+                if batt.voltage <= 10.8:
                     output_queue.put("LOW BATTERY: AUTO LANDING ENGAGED")
                     auto_land = True
-                    lock_on_target = False'''
+                    lock_on_target = False
 
                 ################################################################   
                 ##################  AUTO LAND ##################################
@@ -262,16 +251,3 @@ def set_attitude(drone, roll_angle = 0.0, pitch_angle = 0.0,
     send_attitude_target(drone, roll_angle, pitch_angle,
                         yaw_angle, yaw_rate, use_yaw_rate,
                         thrust)
-    
-    '''
-    start = time.time()
-    while time.time() - start < duration:
-        send_attitude_target(drone, roll_angle, pitch_angle,
-                            yaw_angle, yaw_rate, False,
-                            thrust)
-        time.sleep(0.1)
-    # Reset attitude, or it will persist for 1s more due to the timeout
-    send_attitude_target(drone, 0, 0,
-                        0, 0, True,
-                        thrust)
-    '''

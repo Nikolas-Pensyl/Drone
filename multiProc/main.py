@@ -17,12 +17,12 @@ if __name__ =="__main__":
     drone_process  = mp.Process(target=start_drone, args=(lidar_queue, server_queue, camera_queue, output_queue,))
     
     try:
-        lidar_process.start()
+        #lidar_process.start()
         server_process.start()
         camera_process.start()
         drone_process.start()
 
-        lidar_process.join()
+        #lidar_process.join()
         server_process.join()
         camera_process.join()
         drone_process.join()
@@ -31,7 +31,7 @@ if __name__ =="__main__":
         print("Closing")
 
     finally:
-        lidar_process.kill()
+        #lidar_process.kill()
         server_process.kill()
         camera_process.kill()
         drone_process.kill()
