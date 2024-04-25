@@ -73,8 +73,8 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                     output_queue.put(str(lidar_objs))
                     if not auto_land and thrust>0 and lock_on_target:
                         output_queue.put("AUTO_LANDING")
-                        #auto_land = True
-                        #lock_on_target = False
+                        auto_land = True
+                        lock_on_target = False
                 
 
 
