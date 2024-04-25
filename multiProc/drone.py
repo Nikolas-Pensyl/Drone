@@ -153,7 +153,7 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                     #print(lidar_objs)
                 
                 #Send intructions to drone
-                set_attitude(drone, thrust=thrust, roll_angle=roll, pitch_angle=pitch, yaw_angle=yaw)
+                set_attitude(drone, thrust=thrust, roll_angle=roll, pitch_angle=pitch, yaw_rate=yaw, use_yaw_rate=True)
 
             elif armed and not arm_drone:
                 disarm(drone, output_queue)
@@ -224,10 +224,10 @@ def send_attitude_target(drone, roll_angle = 0.0, pitch_angle = 0.0,
         1, # Target system
         1, # Target component
         0b00000000 if use_yaw_rate else 0b00000100,
-        to_quaternion(roll_angle, pitch_angle, 0), # Quaternion
+        to_quaternion(roll_angle, pitch_angle, yaw_angle), # Quaternion
         0, # Body roll rate in radian
         0, # Body pitch rate in radian
-        math.radians(yaw_rate), # Body yaw rate in radian/second
+        yaw_rate*.4, # Body yaw rate in radian/second
         thrust  # Thrust
     )
     drone.send_mavlink(msg)
@@ -261,7 +261,7 @@ def set_attitude(drone, roll_angle = 0.0, pitch_angle = 0.0,
     Sending the message multiple times is the recommended way.
     """
     send_attitude_target(drone, roll_angle, pitch_angle,
-                        yaw_angle, yaw_rate, False,
+                        yaw_angle, yaw_rate, use_yaw_rate,
                         thrust)
     
     '''

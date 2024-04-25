@@ -4,8 +4,8 @@ from picamera2 import Picamera2,Preview
 import time
 #cap=cv2.VideoCapture('/home/drone/Test/test.h264')
 cv2.startWindowThread()
-lower_range=np.array([30,99,133]) #Neon Yellow
-upper_range=np.array([80,255,255])
+lower_range=np.array([30,204,152]) #Neon Yellow
+upper_range=np.array([47,255,255])
 picam2 = Picamera2()
 #print('here')
 picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888',"size": (640,480)}))
@@ -36,7 +36,7 @@ while True:
     for c in cnts:
         
         if cv2.contourArea(c)>x:
-            #print(cv2.contourArea(c))
+            print(cv2.contourArea(c))
             x,y,w,h=cv2.boundingRect(c)
             obj_middle = (x+w/2,y+h/2)
             if obj_middle[0] < cent_x:
@@ -53,9 +53,9 @@ while True:
             else:
                 output[1] = 'CENTERED'
             
-            if cv2.contourArea(c)>1675:     #1675 is a number found during testing to represent the max of avg values of our object at 10 feet away
+            if cv2.contourArea(c)>4800:     #1675 is a number found during testing to represent the max of avg values of our object at 10 feet away
                 output[2] = 'BACK'
-            elif cv2.contourArea(c)<1450:     #1450 is a number found as the min average as described above
+            elif cv2.contourArea(c)<3500:     #1450 is a number found as the min average as described above
                 output[2] = 'FORWARD'
             else:
                 output[2] = 'CENTERED'

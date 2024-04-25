@@ -7,7 +7,7 @@ from math import floor
 from adafruit_rplidar import RPLidar         #import RPLidar class
 
 
-def lidar_main(lidar_queue):
+def lidar_main():
     # Setup the RPLidar
     PORT_NAME = "/dev/ttyUSB0"                   
     lidar = RPLidar(None, PORT_NAME, timeout=3)  #initializing lidar:no logger, serial port name, serial port connection timeout in seconds
@@ -44,7 +44,7 @@ def lidar_main(lidar_queue):
                     objs.append((start_obj_angle, 359))
 
 
-            lidar_queue.put(objs)
+            print(objs)
     except:
         lidar_queue.put("Error")
 
@@ -53,3 +53,4 @@ def lidar_main(lidar_queue):
 
         lidar.stop()
         lidar.disconnect()
+lidar_main()

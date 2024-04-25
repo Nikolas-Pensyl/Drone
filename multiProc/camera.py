@@ -60,9 +60,9 @@ def camera_main(camera_queue):
                     else:
                         output[1] = 'CENTERED'
                     
-                    if cv2.contourArea(c)>1675:     #1675 is a number found during testing to represent the max of avg values of our object at 10 feet away
+                    if cv2.contourArea(c)>4800:     #1675 is a number found during testing to represent the max of avg values of our object at 10 feet away
                         output[2] = 'BACK'
-                    elif cv2.contourArea(c)<1450:     #1450 is a number found as the min average as described above
+                    elif cv2.contourArea(c)<3500:     #1450 is a number found as the min average as described above
                         output[2] = 'FORWARD'
                     else:
                         output[2] = 'CENTERED'
