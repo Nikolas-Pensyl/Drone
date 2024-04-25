@@ -13,7 +13,6 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
     #ttyS0   = PINS
 
     connection_string = '/dev/ttyACM0'
-    baud_rate = 57600
 
     # Connect to the Vehicle
     #print('Connecting to vehicle on: %s' % connection_string)
@@ -74,8 +73,8 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
                     output_queue.put(str(lidar_objs))
                     if not auto_land and thrust>0 and lock_on_target:
                         output_queue.put("AUTO_LANDING")
-                        #auto_land = True
-                        #lock_on_target = False
+                        auto_land = True
+                        lock_on_target = False
                 
 
 
