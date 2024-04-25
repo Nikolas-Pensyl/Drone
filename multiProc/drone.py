@@ -13,7 +13,6 @@ def start_drone(lidar_queue, server_queue, camera_queue, output_queue):
     #ttyS0   = PINS
 
     connection_string = '/dev/ttyACM0'
-    baud_rate = 57600
 
     # Connect to the Vehicle
     #print('Connecting to vehicle on: %s' % connection_string)
